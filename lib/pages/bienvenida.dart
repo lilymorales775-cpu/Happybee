@@ -13,7 +13,7 @@ class BienvenidaPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Bienvenido a HappyBee'),
+            const Text('¡Bienvenido a HappyBee!'),
             ElevatedButton(
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const LoginPage())),
