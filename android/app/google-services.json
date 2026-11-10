@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "133966059981",
+    "project_id": "happy-bee-751f9",
+    "storage_bucket": "happy-bee-751f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133966059981:android:e176a745df99284de00c84",
+        "android_client_info": {
+          "package_name": "com.example.happybee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133966059981-hsj14a1q7qold1n1s8nd3vdood6cptj4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1bzRbZEs2dkyGGytAEWvYMk9pSA5uJxw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133966059981-hsj14a1q7qold1n1s8nd3vdood6cptj4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
