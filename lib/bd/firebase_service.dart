@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../firebase_options.dart';
+import '../validadores.dart';
 
 class FirebaseService {
   static FirebaseAuth get _auth => FirebaseAuth.instance;
@@ -147,5 +148,74 @@ class FirebaseService {
   static Future<void> cerrarSesion() async {
     await _asegurarInicializacion();
     await _auth.signOut();
+  }
+
+  // Hito 3: CRUD de perfil infantil en la colección children/{childId}.
+  // apoderadoUid se asigna con el usuario autenticado al crear.
+
+  static Future<void> crearNino({
+    required String nombre,
+    required int edad,
+    required String avatar,
+  }) async {
+    await _asegurarInicializacion();
+    // Reutiliza validadores.dart: nombre no vacío y edad entre 7 y 12.
+    final errorNombre = validarObligatorio(nombre);
+    if (errorNombre != null) throw Exception(errorNombre);
+    final errorEdad = validarEdad(edad.toString());
+    if (errorEdad != null) throw Exception(errorEdad);
+    final uid = _auth.currentUser!.uid;
+    await _db.collection('children').add({
+      'apoderadoUid': uid,
+      'nombre': nombre,
+      'edad': edad,
+      'avatar': avatar,
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> listarNinos() async {
+    await _asegurarInicializacion();
+    // Consulta filtrada por apoderadoUid (obligatoria para las reglas).
+    final uid = _auth.currentUser!.uid;
+    final consulta = await _db
+        .collection('children')
+        .where('apoderadoUid', isEqualTo: uid)
+        .get();
+    return consulta.docs.map((d) {
+      final data = d.data();
+      return {...data, 'id': d.id};
+    }).toList();
+  }
+
+  static Future<void> actualizarNino({
+    required String id,
+    String? nombre,
+    int? edad,
+    String? avatar,
+  }) async {
+    await _asegurarInicializacion();
+    final datos = <String, dynamic>{};
+    if (nombre != null) {
+      final error = validarObligatorio(nombre);
+      if (error != null) throw Exception(error);
+      datos['nombre'] = nombre;
+    }
+    if (edad != null) {
+      final error = validarEdad(edad.toString());
+      if (error != null) throw Exception(error);
+      datos['edad'] = edad;
+    }
+    if (avatar != null) {
+      datos['avatar'] = avatar;
+    }
+    if (datos.isNotEmpty) {
+      // apoderadoUid no se incluye: nunca cambia al actualizar.
+      await _db.collection('children').doc(id).update(datos);
+    }
+  }
+
+  static Future<void> eliminarNino(String id) async {
+    await _asegurarInicializacion();
+    await _db.collection('children').doc(id).delete();
   }
 }
