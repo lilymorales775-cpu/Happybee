@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users/{uid}: solo el dueño lee y escribe (Hito 3).
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // usuarios/{uid}: lectura para cualquier autenticado (necesaria para buscar apoderados);
+    // escritura solo para el dueño.
+    match /usuarios/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ninos/{ninoId}: registro de niños (flujo existente).
+    // El cliente ya valida que el apoderado exista; aquí se permite crear
+    // si el niño está autenticado y trae apoderadoId. Lectura/escritura
+    // solo para el niño (ninoId == auth.uid) o el apoderado (apoderadoId == auth.uid).
+    match /ninos/{ninoId} {
+      allow create: if request.auth != null
+          && request.resource.data.apoderadoId != null;
+      allow read, delete: if request.auth != null
+          && (ninoId == request.auth.uid || resource.data.apoderadoId == request.auth.uid);
+      allow update: if request.auth != null
+          && (ninoId == request.auth.uid || resource.data.apoderadoId == request.auth.uid)
+          && request.resource.data.apoderadoId == resource.data.apoderadoId;
+    }
+
+    // children/{childId}: CRUD solo para el apoderado dueño (Hito 3).
+    match /children/{childId} {
+      allow create: if request.auth != null
+          && request.resource.data.apoderadoUid == request.auth.uid;
+      allow read, delete: if request.auth != null
+          && resource.data.apoderadoUid == request.auth.uid;
+      allow update: if request.auth != null
+          && resource.data.apoderadoUid == request.auth.uid
+          && request.resource.data.apoderadoUid == request.auth.uid;
+    }
+
+    // brushing_sessions/{sessionId}: misma lógica por apoderadoUid (Hito 4).
+    match /brushing_sessions/{sessionId} {
+      allow create: if request.auth != null
+          && request.resource.data.apoderadoUid == request.auth.uid;
+      allow read, delete: if request.auth != null
+          && resource.data.apoderadoUid == request.auth.uid;
+      allow update: if request.auth != null
+          && resource.data.apoderadoUid == request.auth.uid
+          && request.resource.data.apoderadoUid == request.auth.uid;
+    }
+
+    // Todo lo demás queda denegado por defecto.
+  }
+}
