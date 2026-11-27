@@ -5,6 +5,7 @@ allprojects {
     }
 }
 
+
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory
         .dir("../../build")
@@ -17,6 +18,18 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+subprojects {
+    val subproject = this
+    if (subproject.name == "camera_android_camerax") {
+        subproject.plugins.withId("com.android.library") {
+            subproject.dependencies.add(
+                "implementation",
+                "androidx.concurrent:concurrent-futures:1.2.0",
+            )
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {

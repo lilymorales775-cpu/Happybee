@@ -218,4 +218,33 @@ class FirebaseService {
     await _asegurarInicializacion();
     await _db.collection('children').doc(id).delete();
   }
+
+  // Hito 4: guarda una sesión de cepillado en Firestore (sin imagen, solo datos de la sesión).
+  static Future<void> guardarSesionCepillado({
+    required String apoderadoUid,
+    required String ninoId,
+    required int duracionSegundos,
+  }) async {
+    await _asegurarInicializacion();
+    await _db.collection('brushing_sessions').add({
+      'apoderadoUid': apoderadoUid,
+      'ninoId': ninoId,
+      'duracionSegundos': duracionSegundos,
+      'fecha': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // Hito 5: lista las sesiones de cepillado del usuario autenticado (apoderadoUid).
+  static Future<List<Map<String, dynamic>>> listarSesiones() async {
+    await _asegurarInicializacion();
+    final uid = _auth.currentUser!.uid;
+    final consulta = await _db
+        .collection('brushing_sessions')
+        .where('apoderadoUid', isEqualTo: uid)
+        .get();
+    return consulta.docs.map((d) {
+      final data = d.data();
+      return {...data, 'id': d.id};
+    }).toList();
+  }
 }

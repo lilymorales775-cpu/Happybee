@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../bd/firebase_service.dart';
 import '../validadores.dart';
 import 'perfil.dart';
+import 'historial.dart';
 
 class HomeApoderadoPage extends StatefulWidget {
   const HomeApoderadoPage({super.key});
@@ -188,6 +189,11 @@ class _HomeApoderadoPageState extends State<HomeApoderadoPage> {
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const PerfilPage())),
             child: const Text('Perfil'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const HistorialPage())),
+            child: const Text('Historial'),
           ),
         ],
       ),
